@@ -1,0 +1,14 @@
+/venv
+/app/api/__pycache__
+requirements.txt
+squeeze-and-panic.py
+.flaskenv
+/app/__init__.py
+db.py
+*__pycache__
+/app/api/resources/__pycache__
+__pycache__/
+data.db
+
+
+
