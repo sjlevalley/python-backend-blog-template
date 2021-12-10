@@ -1,5 +1,4 @@
 from flask_restful import Resource, reqparse, request
-import json
 from flask_jwt import jwt_required
 from models.comment import CommentModel
 

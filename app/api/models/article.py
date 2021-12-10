@@ -14,8 +14,8 @@ class ArticleModel(db.Model):
     author = db.Column(db.String(80))
     text = db.Column(db.String(80000))
 
-    comments = db.relationship(CommentModel, lazy='dynamic')
-    votes = db.relationship(VoteModel, lazy='dynamic')
+    comments = db.relationship(CommentModel, lazy='dynamic', overlaps="article")
+    votes = db.relationship(VoteModel, lazy='dynamic', overlaps="article")
 
     def __init__(self, title, subtitle, date, author, text):
         self.title = title

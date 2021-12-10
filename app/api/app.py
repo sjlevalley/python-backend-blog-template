@@ -6,7 +6,7 @@ from flask_jwt import JWT
 
 from resources.user import UserRegister, UserList, UserByID, UserByUsername
 from resources.comment import CommentByID, CommentByAuthor ,CommentList, CommentByArticle
-from resources.article import Article, ArticleList
+from resources.article import ArticleByTitle, ArticleList, ArticleByID
 from resources.vote import VoteList, VoteByUserID, VoteByID, VoteByArticle
 
 from security import authenticate, identity
@@ -26,7 +26,8 @@ def create_tables():
 jwt = JWT(app, authenticate, identity)  # /auth
 
 api.add_resource(ArticleList, '/api/articles')
-api.add_resource(Article, '/api/articles/<string:title>')
+api.add_resource(ArticleByTitle, '/api/articles/title/<string:title>')
+api.add_resource(ArticleByID, '/api/articles/id/<string:id>')
 
 api.add_resource(CommentList, '/api/comments')
 api.add_resource(CommentByID, '/api/comments/<string:id>')
