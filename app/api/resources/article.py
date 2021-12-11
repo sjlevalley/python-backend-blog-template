@@ -1,15 +1,17 @@
 from flask_restful import Resource, request, reqparse
 from sqlalchemy import update
+from flask_jwt_extended import jwt_required
 from models.article import ArticleModel
 
 
+_article_parser = reqparse.RequestParser()
+_article_parser.add_argument('title', type=str, required=False, help="Title cannot be blank.")
+_article_parser.add_argument('subtitle', type=str, required=False, help="Subtitle cannot be blank.")
+_article_parser.add_argument('date', type=str, required=False, help="Date field cannot be blank.")
+_article_parser.add_argument('author', type=str, required=False, help="Author field cannot be blank.")
+_article_parser.add_argument('text', type=str, required=False, help="Text field cannot be blank.")
+
 class ArticleByTitle(Resource):
-    parser = reqparse.RequestParser()
-    parser.add_argument('title', type=str, required=False, help="Title cannot be blank.")
-    parser.add_argument('subtitle', type=str, required=False, help="Subtitle cannot be blank.")
-    parser.add_argument('date', type=str, required=False, help="Date field cannot be blank.")
-    parser.add_argument('author', type=str, required=False, help="Author field cannot be blank.")
-    parser.add_argument('text', type=str, required=False, help="Text field cannot be blank.")
     
     def get(self, title):
         try: 
@@ -22,6 +24,7 @@ class ArticleByTitle(Resource):
 
         return article.json(), 200
 
+    @jwt_required()
     def delete(self, title):
         try: 
             article = ArticleModel.find_by_title(title)
@@ -38,8 +41,9 @@ class ArticleByTitle(Resource):
         except:
             return {"message": "An error occurred while trying to delete this article."}, 500
 
+    @jwt_required()
     def put(self, title): # Currently set up to only be able to edit the text
-        data = ArticleByTitle.parser.parse_args()
+        data = _article_parser.parse_args()
         try: 
             article = ArticleModel.find_by_title(title)
         except:
@@ -59,12 +63,6 @@ class ArticleByTitle(Resource):
 
 
 class ArticleByID(Resource):
-    parser = reqparse.RequestParser()
-    parser.add_argument('title', type=str, required=False, help="Title cannot be blank.")
-    parser.add_argument('subtitle', type=str, required=False, help="Subtitle cannot be blank.")
-    parser.add_argument('date', type=str, required=False, help="Date field cannot be blank.")
-    parser.add_argument('author', type=str, required=False, help="Author field cannot be blank.")
-    parser.add_argument('text', type=str, required=False, help="Text field cannot be blank.")
     
     def get(self, id):
         try: 
@@ -77,6 +75,7 @@ class ArticleByID(Resource):
 
         return article.json(), 200
 
+    @jwt_required()
     def delete(self, id):
         try: 
             article = ArticleModel.find_by_id(id)
@@ -93,8 +92,9 @@ class ArticleByID(Resource):
         except:
             return {"message": "An error occurred while trying to delete this article."}, 500
 
+    @jwt_required()
     def put(self, id): # Currently set up to only be able to edit the text
-        data = ArticleByID.parser.parse_args()
+        data = _article_parser.parse_args()
         try: 
             article = ArticleModel.find_by_id(id)
         except:
@@ -114,21 +114,16 @@ class ArticleByID(Resource):
         
 
 class ArticleList(Resource):
-    parser = reqparse.RequestParser()
-    parser.add_argument('title', type=str, required=True, help="Title cannot be blank.")
-    parser.add_argument('subtitle', type=str, required=True, help="Subtitle cannot be blank.")
-    parser.add_argument('date', type=str, required=True, help="Date field cannot be blank.")
-    parser.add_argument('author', type=str, required=True, help="Author field cannot be blank.")
-    parser.add_argument('text', type=str, required=True, help="Text field cannot be blank.")
 
     def get(self):
         try:
-            return [article.json() for article in ArticleModel.query.all()]
+            return [article.json() for article in ArticleModel.find_all()]
         except:
             return {"message": "An error occurred while trying to fetch all articles."}, 500
 
+    @jwt_required()
     def post(self):
-        data = ArticleList.parser.parse_args()
+        data = _article_parser.parse_args()
         
         try:
             existing_article = ArticleModel.find_by_title(data['title'])

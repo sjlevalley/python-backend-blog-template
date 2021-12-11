@@ -14,7 +14,7 @@ class UserModel(db.Model):
         self.password = password
         self.email = email
 
-    def json(self):
+    def json(self):  ## Be sure to erase the 'password' field on line 21 before use, I just left this in here for testing!
         return {
             'id': self.id,
             'username': self.username, 
@@ -44,3 +44,7 @@ class UserModel(db.Model):
     @classmethod
     def find_by_email(cls, email):
         return cls.query.filter_by(email=email).first()
+
+    @classmethod
+    def find_all(cls):
+        return cls.query.all()

@@ -1,22 +1,24 @@
 from flask_restful import Resource, reqparse, request
-from flask_jwt import jwt_required
+from flask_jwt_extended import jwt_required
 from models.comment import CommentModel
+
+_comment_parser = reqparse.RequestParser()
+_comment_parser.add_argument('date', type=str, required=False, help="Date field cannot be blank.")
+_comment_parser.add_argument('author', type=str, required=False, help="Author Field cannot be blank.")
+_comment_parser.add_argument('text', type=str, required=False, help="Text field cannot be blank.")
+_comment_parser.add_argument('article_id', type=str, required=False, help="article_id field cannot be blank.")
 
 
 class CommentByID(Resource):
-    parser = reqparse.RequestParser()
-    parser.add_argument('date', type=str, required=False, help="Date field cannot be blank.")
-    parser.add_argument('author', type=str, required=False, help="Author Field cannot be blank.")
-    parser.add_argument('text', type=str, required=False, help="Text field cannot be blank.")
-    parser.add_argument('article_id', type=str, required=False, help="article_id field cannot be blank.")
 
-    # @jwt_required()
+    @jwt_required()
     def get(self, id):
         comment = CommentModel.find_by_id(id)
         if not comment:
             return {'message': 'Comment not found'}, 404
         return comment.json(), 200
         
+    @jwt_required()
     def delete(self, id):
         comment = CommentModel.find_by_id(id)
         if comment is None:
@@ -25,8 +27,9 @@ class CommentByID(Resource):
         comment.delete_from_db()
         return {'message': 'Comment deleted!'}, 200
 
+    @jwt_required()
     def put(self, id):
-        data = CommentByID.parser.parse_args()
+        data = _comment_parser.parse_args()
         comment = CommentModel.find_by_id(id)
 
         if not comment:
@@ -41,7 +44,7 @@ class CommentByID(Resource):
 
 class CommentByAuthor(Resource):
     
-    # @jwt_required()
+    @jwt_required()
     def get(self, author):
         comments = CommentModel.find_by_author(author)
 
@@ -49,7 +52,8 @@ class CommentByAuthor(Resource):
             return {'message': f'No Comments by author: {author} found!'}, 404
 
         return [comment.json() for comment in comments]
-        
+
+    @jwt_required()
     def delete(self, author):
         comments = CommentModel.find_by_author(author)
 
@@ -72,6 +76,7 @@ class CommentByArticle(Resource):
 
         return [comment.json() for comment in comments]
         
+    @jwt_required()  
     def delete(self, article_id):
         comments = CommentModel.find_by_article(article_id)
 
@@ -86,19 +91,21 @@ class CommentByArticle(Resource):
 
 class CommentList(Resource):
     parser = reqparse.RequestParser()
-    parser.add_argument('date', type=str, required=True, help="Date field cannot be blank.")
-    parser.add_argument('author', type=str, required=True, help="Author Field cannot be blank.")
-    parser.add_argument('text', type=str, required=True, help="Text field cannot be blank.")
-    parser.add_argument('article_id', type=str, required=True, help="article_id field cannot be blank.")
+    parser.add_argument('date', type=str, required=False, help="Date field cannot be blank.")
+    parser.add_argument('author', type=str, required=False, help="Author Field cannot be blank.")
+    parser.add_argument('text', type=str, required=False, help="Text field cannot be blank.")
+    parser.add_argument('article_id', type=str, required=False, help="article_id field cannot be blank.")
     
     def get(self):
-        return list(map(lambda x: x.json(), CommentModel.query.all())), 200
+        return list(map(lambda x: x.json(), CommentModel.find_all())), 200
 
+    @jwt_required()
     def post(self):
-        data = CommentList.parser.parse_args()
+        print("hello")
+        data = _comment_parser.parse_args()
         
         try:
-            comment = CommentModel(**data)
+            comment = CommentModel(data['date'], data['author'], data['text'], data['article_id'])
             comment.save_to_db()
         except:
             return {"message": "An error occurred inserting the comment."}, 500

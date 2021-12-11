@@ -43,6 +43,10 @@ class VoteModel(db.Model):
         votes = cls.query.filter_by(article_id=article_id).all()
         return votes
 
+    @classmethod
+    def find_all(cls):
+        return cls.query.all()
+
     def save_to_db(self):
         db.session.add(self)
         db.session.commit()

@@ -1,6 +1,5 @@
 /venv
 /app/api/__pycache__
-requirements.txt
 squeeze-and-panic.py
 .flaskenv
 /app/__init__.py

@@ -2,20 +2,19 @@
 
 from flask import Flask
 from flask_restful import Api
-from flask_jwt import JWT
+from flask_jwt_extended import JWTManager
 
-from resources.user import UserRegister, UserList, UserByID, UserByUsername
+from resources.user import UserRegister, UserList, UserByID, UserByUsername, UserLogin
 from resources.comment import CommentByID, CommentByAuthor ,CommentList, CommentByArticle
 from resources.article import ArticleByTitle, ArticleList, ArticleByID
 from resources.vote import VoteList, VoteByUserID, VoteByID, VoteByArticle
 
-from security import authenticate, identity
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['PROPAGATE_EXCEPTIONS'] = True
-app.secret_key = 'steve'
+app.secret_key = 'steve' # can use app.config['JWT_SECRET_KEY']
 api = Api(app)
 
 
@@ -23,7 +22,7 @@ api = Api(app)
 def create_tables():
     db.create_all()
 
-jwt = JWT(app, authenticate, identity)  # /auth
+jwt = JWTManager(app)
 
 api.add_resource(ArticleList, '/api/articles')
 api.add_resource(ArticleByTitle, '/api/articles/title/<string:title>')
@@ -42,6 +41,7 @@ api.add_resource(VoteByID, '/api/votes/<string:id>')
 api.add_resource(UserList, '/api/users')
 api.add_resource(UserByID, '/api/users/id/<string:id>')
 api.add_resource(UserByUsername, '/api/users/username/<string:username>')
+api.add_resource(UserLogin, '/login')
 api.add_resource(UserRegister, '/register')
 
 if __name__ == '__main__':

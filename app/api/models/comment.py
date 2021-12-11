@@ -43,6 +43,10 @@ class CommentModel(db.Model):
         comments = cls.query.filter_by(article_id=article_id).all()
         return comments
 
+    @classmethod
+    def find_all(cls):
+        return cls.query.all()
+
     def save_to_db(self):
         db.session.add(self)
         db.session.commit()

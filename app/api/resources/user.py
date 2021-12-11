@@ -1,16 +1,20 @@
 from flask_restful import Resource, reqparse, request
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required
+from werkzeug.security import safe_str_cmp
 import bcrypt
 from models.user import UserModel
 
+# For the problem with updating the user password when it was hashed, this may be able to be resolved in the UserLogin class
+
+_user_parser = reqparse.RequestParser()
+_user_parser.add_argument('username', type=str, required=True, help="Username field cannot be blank.")
+_user_parser.add_argument('password', type=str, required=True, help="Password field cannot be blank.")
+_user_parser.add_argument('email', type=str, required=False, help="Email field cannot be blank.")
+
 
 class UserRegister(Resource):
-    parser = reqparse.RequestParser()
-    parser.add_argument('username', type=str, required=True, help="Username field cannot be blank.")
-    parser.add_argument('password', type=str, required=True, help="Password field cannot be blank.")
-    parser.add_argument('email', type=str, required=True, help="Email field cannot be blank.")
-
     def post(self):
-        data = UserRegister.parser.parse_args()
+        data = _user_parser.parse_args()
 
         try: 
             if UserModel.find_by_username(data['username']):
@@ -24,7 +28,8 @@ class UserRegister(Resource):
             hashed = bcrypt.hashpw(entered_password, salt)
             decoded_hashed_password = hashed.decode('utf-8')
             
-            user = UserModel(data['username'], decoded_hashed_password, data['email'])
+            # user = UserModel(data['username'], decoded_hashed_password, data['email'])
+            user = UserModel(data['username'], data['password'], data['email'])
             user.save_to_db()
 
             return user.json() , 201
@@ -33,12 +38,23 @@ class UserRegister(Resource):
             return {"message": "An error occurred while creating this user."}, 500
 
 
+class UserLogin(Resource):
+    
+    @classmethod
+    def post(self):
+        data = _user_parser.parse_args()
+        user = UserModel.find_by_username(data['username'])
+        if user and safe_str_cmp(user.password, data['password']):
+            access_token = create_access_token(identity=user.id, fresh=True)
+            refresh_token = create_refresh_token(user.id)
+            return {
+                'access_token' : access_token,
+                'refresh_token' : refresh_token
+            }
+        return {'message': 'Invalid credentials'}, 401
+
+
 class UserByID(Resource):
-    parser = reqparse.RequestParser()
-    parser.add_argument('username', type=str, required=False, help="This field cannot be blank.")
-    parser.add_argument('new_password', type=str, required=False, help="This field cannot be blank.")
-    parser.add_argument('old_password', type=str, required=False, help="This field cannot be blank.")
-    parser.add_argument('email', type=str, required=False, help="This field cannot be blank.")
     
     def get(self, id):
         try: 
@@ -111,16 +127,7 @@ class UserByID(Resource):
         return user.json(), 200
          
             
-            
-
-        
-
-
 class UserByUsername(Resource):
-    parser = reqparse.RequestParser()
-    parser.add_argument('username', type=str, required=False, help="This field cannot be blank.")
-    parser.add_argument('password', type=str, required=False, help="This field cannot be blank.")
-    parser.add_argument('email', type=str, required=False, help="This field cannot be blank.")
     
     def get(self, username):
         try:
@@ -146,7 +153,7 @@ class UserByUsername(Resource):
 
     def put(self, username):
         try:
-            data = UserByUsername.parser.parse_args()
+            # data = _user_parser.parse_args()
 
             user = UserModel.find_by_username(username)
             if not user:
@@ -179,6 +186,6 @@ class UserByUsername(Resource):
 class UserList(Resource):
     def get(self):
         try:
-            return list(map(lambda x: x.json(), UserModel.query.all())), 200
+            return list(map(lambda x: x.json(), UserModel.find_all())), 200
         except:
-            return {"message": "An error occurred while creating this user."}, 500
+            return {"message": "An error occurred while fetching all users."}, 500
