@@ -62,9 +62,9 @@ class UserByID(Resource):
             return {"message": "An error occurred while deleting this user."}, 500
 
     def put(self, id):
-        data = UserByID.parser.parse_args()
         user = UserModel.find_by_id(id)
-        print(data)
+        data = request.get_json()
+    
         if not user:
                 return {'message': f'No user with id: {id} exists!'}, 404
 
@@ -103,12 +103,12 @@ class UserByID(Resource):
             decoded_hashed_password = hashed.decode('utf-8')
 
             user.password = decoded_hashed_password
-            user.username = user.username
-            user.email = user.email
+            print(user.username)
+            
                 
-            user.update_db()
+        user.update_db()
         
-            return user.json(), 200
+        return user.json(), 200
          
             
             
