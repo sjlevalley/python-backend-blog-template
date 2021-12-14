@@ -1,6 +1,6 @@
 from flask_restful import Resource, request, reqparse
 from sqlalchemy import update
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt, get_jwt_identity
 from models.article import ArticleModel
 
 
@@ -24,7 +24,7 @@ class ArticleByTitle(Resource):
 
         return article.json(), 200
 
-    # @jwt_required() # Token doesn't have to be Fresh if no arguments passed
+    @jwt_required() # Token doesn't have to be Fresh if no arguments passed
     def delete(self, title):
         try: 
             article = ArticleModel.find_by_title(title)
@@ -75,7 +75,7 @@ class ArticleByID(Resource):
 
         return article.json(), 200
 
-    # @jwt_required() # Token doesn't have to be Fresh if no arguments passed
+    @jwt_required() # Token doesn't have to be Fresh if no arguments passed
     def delete(self, id):
         try: 
             article = ArticleModel.find_by_id(id)
@@ -92,7 +92,7 @@ class ArticleByID(Resource):
         except:
             return {"message": "An error occurred while trying to delete this article."}, 500
 
-    # @jwt_required() # Token doesn't have to be Fresh if no arguments passed
+    @jwt_required() # Token doesn't have to be Fresh if no arguments passed
     def put(self, id): # Currently set up to only be able to edit the text
         data = _article_parser.parse_args()
         try: 
@@ -114,13 +114,14 @@ class ArticleByID(Resource):
         
 
 class ArticleList(Resource):
-
+    @jwt_required()
     def get(self):
         try:
             return [article.json() for article in ArticleModel.find_all()]
         except:
             return {"message": "An error occurred while trying to fetch all articles."}, 500
 
+    @jwt_required()
     def post(self):
         data = _article_parser.parse_args()
         

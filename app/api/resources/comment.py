@@ -98,6 +98,7 @@ class CommentList(Resource):
     @jwt_required(optional=True) # If not logged in, user will only receive partial data with the 'optional= True' argument
     def get(self):
         user_id = get_jwt_identity()
+        print(user_id)
         comments = [comment.json() for comment in CommentModel.find_all()]
         if user_id:
             return {'comments': comments}, 200

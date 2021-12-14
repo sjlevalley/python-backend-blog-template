@@ -31,8 +31,8 @@ class UserRegister(Resource):
             hashed = bcrypt.hashpw(entered_password, salt)
             decoded_hashed_password = hashed.decode('utf-8')
             
-            # user = UserModel(data['username'], decoded_hashed_password, data['email']) # Saves Hashed Password 
-            user = UserModel(data['username'], data['password'], data['email']) # Saves unhashed password for testing only
+            user = UserModel(data['username'], decoded_hashed_password, data['email']) # Saves Hashed Password 
+            # user = UserModel(data['username'], data['password'], data['email']) # Saves unhashed password for testing only
             user.save_to_db()
             return user.json() , 201
         
@@ -51,8 +51,8 @@ class UserLogin(Resource):
         hashed = bcrypt.hashpw(entered_password, salt)
         decoded_hashed_password = hashed.decode('utf-8')
 
-        # if user and safe_str_cmp(decoded_hashed_password, user.password):
-        if user and safe_str_cmp(data['password'], user.password): # Use if you saved an unhashed password for testing only
+        if user and safe_str_cmp(decoded_hashed_password, user.password):
+        # if user and safe_str_cmp(data['password'], user.password): # Use if you saved an unhashed password for testing only
             access_token = create_access_token(identity=user.id, fresh=True)
             refresh_token = create_refresh_token(user.id)
             return {
@@ -140,11 +140,11 @@ class UserByID(Resource):
                 
             entered_password = data['new_password'].encode('utf-8')
 
-            # hashed = bcrypt.hashpw(entered_password, salt)
-            # decoded_hashed_password = hashed.decode('utf-8')
+            hashed = bcrypt.hashpw(entered_password, salt)
+            decoded_hashed_password = hashed.decode('utf-8')
 
-            # user.password = decoded_hashed_password
-            user.password = data['new_password']
+            user.password = decoded_hashed_password
+            # user.password = data['new_password']
             print(user.username)
             
                 
@@ -210,6 +210,7 @@ class UserByUsername(Resource):
 
 
 class UserList(Resource):
+    @jwt_required()
     def get(self):
         try:
             return list(map(lambda x: x.json(), UserModel.find_all())), 200

@@ -35,8 +35,9 @@ def add_claims_to_jwt(identity):
 
 @jwt.token_in_blocklist_loader # Check to see if token is in the Blocklist
 def check_if_token_in_blocklist(jwt_header, jwt_payload):
+    print(jwt_payload)
     user_id = jwt_payload['jti']
-    return user_id in BLOCKLIST, 400
+    return user_id in BLOCKLIST
 
 @jwt.expired_token_loader # Tells Flask what message to return to the user if the token is expired
 def expired_token_loader(jwt_header, jwt_payload):
@@ -46,7 +47,7 @@ def expired_token_loader(jwt_header, jwt_payload):
     }), 401
 
 @jwt.revoked_token_loader # Returns message after token has been revoked (user logged out)
-def revoked_token_response():
+def revoked_token_response(jwt_header, jwt_payload):
     return jsonify({
         'message': 'Your Token has been revoked',
         'error': 'token_revoked'

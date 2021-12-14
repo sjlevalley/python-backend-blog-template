@@ -2,7 +2,7 @@
 
 # E.G. - Below, user with ID of 2 or 3 will be denied
 
-BLOCKLIST = {2, 3}
+BLOCKLIST = { 2, 3 }
 
 # Notes from Flask-JWT-Extended docs regarding blocklist:
 

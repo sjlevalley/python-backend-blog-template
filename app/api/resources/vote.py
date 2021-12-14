@@ -27,6 +27,7 @@ class VoteByID(Resource):
         vote.delete_from_db()
         return {'message': 'Vote deleted!'}, 200
 
+
 class VoteByUserID(Resource):
 
     # @jwt_required() # Token doesn't have to be Fresh if no arguments passed
@@ -56,14 +57,14 @@ class VoteByUserID(Resource):
 
 class VoteByArticle(Resource):
 
-    # @jwt_required() # Token doesn't have to be Fresh if no arguments passed
+    @jwt_required() # Token doesn't have to be Fresh if no arguments passed
     def get(self, id):
         votes = VoteModel.find_by_article(id)
         if not votes:
             return {'message': f'No votes found for article with id: {id}'}, 404
         return [vote.json() for vote in votes], 200
         
-    # @jwt_required() # Token doesn't have to be Fresh if no arguments passed
+    @jwt_required() # Token doesn't have to be Fresh if no arguments passed
     def delete(self, id):
         votes = VoteModel.find_by_article(id)
         if votes is None:
@@ -81,7 +82,7 @@ class VoteList(Resource):
         except:
             return {"message": "An error occurred when fetching all votes."}, 500
 
-    # @jwt_required() # Token doesn't have to be Fresh if no arguments passed
+    @jwt_required() # Token doesn't have to be Fresh if no arguments passed
     def post(self):
         data = _vote_parser.parse_args()
 
