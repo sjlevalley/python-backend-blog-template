@@ -13,7 +13,7 @@ _article_parser.add_argument('text', type=str, required=False, help="Text field 
 
 class ArticleByTitle(Resource):
     
-    def get(self, title):
+    def get(self, title): 
         try: 
             article = ArticleModel.find_by_title(title)
         except:
@@ -24,7 +24,7 @@ class ArticleByTitle(Resource):
 
         return article.json(), 200
 
-    @jwt_required()
+    # @jwt_required() # Token doesn't have to be Fresh if no arguments passed
     def delete(self, title):
         try: 
             article = ArticleModel.find_by_title(title)
@@ -41,7 +41,7 @@ class ArticleByTitle(Resource):
         except:
             return {"message": "An error occurred while trying to delete this article."}, 500
 
-    @jwt_required()
+    # @jwt_required()
     def put(self, title): # Currently set up to only be able to edit the text
         data = _article_parser.parse_args()
         try: 
@@ -75,7 +75,7 @@ class ArticleByID(Resource):
 
         return article.json(), 200
 
-    @jwt_required()
+    # @jwt_required() # Token doesn't have to be Fresh if no arguments passed
     def delete(self, id):
         try: 
             article = ArticleModel.find_by_id(id)
@@ -92,7 +92,7 @@ class ArticleByID(Resource):
         except:
             return {"message": "An error occurred while trying to delete this article."}, 500
 
-    @jwt_required()
+    # @jwt_required() # Token doesn't have to be Fresh if no arguments passed
     def put(self, id): # Currently set up to only be able to edit the text
         data = _article_parser.parse_args()
         try: 
@@ -121,7 +121,6 @@ class ArticleList(Resource):
         except:
             return {"message": "An error occurred while trying to fetch all articles."}, 500
 
-    @jwt_required()
     def post(self):
         data = _article_parser.parse_args()
         

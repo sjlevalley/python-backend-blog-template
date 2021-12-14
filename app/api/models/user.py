@@ -18,7 +18,7 @@ class UserModel(db.Model):
         return {
             'id': self.id,
             'username': self.username, 
-            'password': self.password,
+            'password': self.password, # Generally don't want to have this visible
             'email': self.email            
             }
 

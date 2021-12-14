@@ -1,5 +1,5 @@
 from flask_restful import Resource, reqparse, request
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt, get_jwt_identity
 from models.comment import CommentModel
 
 _comment_parser = reqparse.RequestParser()
@@ -11,15 +11,19 @@ _comment_parser.add_argument('article_id', type=str, required=False, help="artic
 
 class CommentByID(Resource):
 
-    @jwt_required()
+    @jwt_required() # Token doesn't have to be Fresh if no arguments passed
     def get(self, id):
         comment = CommentModel.find_by_id(id)
         if not comment:
             return {'message': 'Comment not found'}, 404
         return comment.json(), 200
         
-    @jwt_required()
+    @jwt_required() # Token doesn't have to be Fresh if no arguments passed
     def delete(self, id):
+        claims = get_jwt()
+        print(claims['is_admin'])
+        if not claims['is_admin']:
+             return {'message': 'You need Admin privileges to delete this comment.'}, 401
         comment = CommentModel.find_by_id(id)
         if comment is None:
             return {'message': f'No Comment found with id: {id}!'}, 404
@@ -42,9 +46,10 @@ class CommentByID(Resource):
         
         return comment.json(), 200
 
+
 class CommentByAuthor(Resource):
     
-    @jwt_required()
+    @jwt_required() # Token doesn't have to be Fresh if no arguments passed
     def get(self, author):
         comments = CommentModel.find_by_author(author)
 
@@ -53,7 +58,7 @@ class CommentByAuthor(Resource):
 
         return [comment.json() for comment in comments]
 
-    @jwt_required()
+    @jwt_required() # Token doesn't have to be Fresh if no arguments passed
     def delete(self, author):
         comments = CommentModel.find_by_author(author)
 
@@ -76,7 +81,7 @@ class CommentByArticle(Resource):
 
         return [comment.json() for comment in comments]
         
-    @jwt_required()  
+    @jwt_required() # Token doesn't have to be Fresh if no arguments passed
     def delete(self, article_id):
         comments = CommentModel.find_by_article(article_id)
 
@@ -90,18 +95,19 @@ class CommentByArticle(Resource):
 
 
 class CommentList(Resource):
-    parser = reqparse.RequestParser()
-    parser.add_argument('date', type=str, required=False, help="Date field cannot be blank.")
-    parser.add_argument('author', type=str, required=False, help="Author Field cannot be blank.")
-    parser.add_argument('text', type=str, required=False, help="Text field cannot be blank.")
-    parser.add_argument('article_id', type=str, required=False, help="article_id field cannot be blank.")
-    
+    @jwt_required(optional=True) # If not logged in, user will only receive partial data with the 'optional= True' argument
     def get(self):
-        return list(map(lambda x: x.json(), CommentModel.find_all())), 200
+        user_id = get_jwt_identity()
+        comments = [comment.json() for comment in CommentModel.find_all()]
+        if user_id:
+            return {'comments': comments}, 200
 
-    @jwt_required()
+        return {
+            'comments': [comment['date'] for comment in comments],
+            'message': 'More data available if you log in.'
+        }, 200
+
     def post(self):
-        print("hello")
         data = _comment_parser.parse_args()
         
         try:

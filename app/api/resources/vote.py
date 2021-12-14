@@ -11,14 +11,14 @@ _vote_parser.add_argument('article_id', type=str, required=True, help="Every ite
 
 
 class VoteByID(Resource):
-    @jwt_required()
+    # @jwt_required() # Token doesn't have to be Fresh if no arguments passed
     def get(self, id):
         vote = VoteModel.find_by_id(id)
         if not vote:
             return {'message': f'vote with id: {id} not found'}, 404
         return vote.json(), 200
 
-    @jwt_required()    
+    # @jwt_required() # Token doesn't have to be Fresh if no arguments passed  
     def delete(self, id):
         vote = VoteModel.find_by_id(id)
         if vote is None:
@@ -29,7 +29,7 @@ class VoteByID(Resource):
 
 class VoteByUserID(Resource):
 
-    @jwt_required()
+    # @jwt_required() # Token doesn't have to be Fresh if no arguments passed
     def get(self, user_id):
         try: 
             votes = VoteModel.find_by_user(user_id)
@@ -41,7 +41,7 @@ class VoteByUserID(Resource):
 
         return [vote.json() for vote in votes]
         
-    @jwt_required()
+    # @jwt_required() # Token doesn't have to be Fresh if no arguments passed
     def delete(self, author):
         votes = VoteModel.find_by_author(author)
 
@@ -56,14 +56,14 @@ class VoteByUserID(Resource):
 
 class VoteByArticle(Resource):
 
-    @jwt_required()
+    # @jwt_required() # Token doesn't have to be Fresh if no arguments passed
     def get(self, id):
         votes = VoteModel.find_by_article(id)
         if not votes:
             return {'message': f'No votes found for article with id: {id}'}, 404
         return [vote.json() for vote in votes], 200
         
-    @jwt_required()
+    # @jwt_required() # Token doesn't have to be Fresh if no arguments passed
     def delete(self, id):
         votes = VoteModel.find_by_article(id)
         if votes is None:
@@ -81,7 +81,7 @@ class VoteList(Resource):
         except:
             return {"message": "An error occurred when fetching all votes."}, 500
 
-    @jwt_required()
+    # @jwt_required() # Token doesn't have to be Fresh if no arguments passed
     def post(self):
         data = _vote_parser.parse_args()
 
