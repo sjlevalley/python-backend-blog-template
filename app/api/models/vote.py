@@ -1,4 +1,5 @@
 from db import db
+import uuid
 
 
 class VoteModel(db.Model):
@@ -15,6 +16,7 @@ class VoteModel(db.Model):
     # votes = db.relationship('VoteModel', lazy='dynamic')
 
     def __init__(self, date, user_id, type, article_id):
+        self.id = uuid.uuid4
         self.date = date
         self.user_id = user_id
         self.type = type
@@ -28,6 +30,12 @@ class VoteModel(db.Model):
             'type': self.type,
             'article_id': self.article_id
             }
+    
+    def __str__(self) -> str:
+        return (f"ID: {self.id}, Date: {self.date}, User ID: {self.user_id}, Type: {self.type}, Article ID: {self.article_id}")
+
+    def __str__(self) -> str:
+        return f"<User({self.id}, {self.date}, {self.user_id}, {self.type}, {self.article_id})>"
 
     @classmethod
     def find_by_id(cls, id):

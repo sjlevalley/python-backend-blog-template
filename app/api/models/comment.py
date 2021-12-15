@@ -1,4 +1,5 @@
 from db import db
+import uuid
 
 
 class CommentModel(db.Model):
@@ -15,10 +16,17 @@ class CommentModel(db.Model):
     # votes = db.relationship('VoteModel', lazy='dynamic')
 
     def __init__(self, date, author, text, article_id):
+        self.id = uuid.uuid4
         self.date = date
         self.author = author
         self.text = text
         self.article_id = article_id
+    
+    def __str__(self) -> str:
+        return (f"Comment ID: {self.id} Article ID: {self.article_id}, Date: {self.date}, Author: {self.author}")
+
+    def __str__(self) -> str:
+        return f"<Comment({self.id}, {self.article_id}, {self.date}, {self.author})>"
 
     def json(self):
         return {

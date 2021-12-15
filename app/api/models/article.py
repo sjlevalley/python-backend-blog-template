@@ -18,12 +18,18 @@ class ArticleModel(db.Model):
     votes = db.relationship(VoteModel, lazy='dynamic', overlaps="article")
 
     def __init__(self, title, subtitle, date, author, text):
+        self.id = uuid.uuid4
         self.title = title
         self.subtitle = subtitle
         self.date = date
         self.author = author
         self.text = text
-        
+
+    def __str__(self) -> str:
+        return (f"Article ID: {self.id}, Article Title: {self.title}, Subtitle: {self.subtitle}, Date: {self.date}, Author: {self.author}")
+
+    def __repr__(self) -> str:
+        return f"<Article({self.id}, {self.title}, {self.subtitle}, {self.date}, {self.author})>"
 
     def json(self):
         return {

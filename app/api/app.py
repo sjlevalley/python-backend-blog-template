@@ -1,4 +1,7 @@
 # Add Try/Catches
+# Add uuid's after switch to PostgreSQL
+# Add TypeHints
+# Add Raise Errors
 
 from flask import Flask, jsonify
 from flask_restful import Api
@@ -49,7 +52,7 @@ def expired_token_loader(jwt_header, jwt_payload):
 @jwt.revoked_token_loader # Returns message after token has been revoked (user logged out)
 def revoked_token_response(jwt_header, jwt_payload):
     return jsonify({
-        'message': 'Your Token has been revoked',
+        'message': 'Your Token has been revoked (You may be logged out)',
         'error': 'token_revoked'
     }), 401
 

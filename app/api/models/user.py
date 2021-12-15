@@ -1,4 +1,5 @@
 from db import db
+import uuid
 
 
 class UserModel(db.Model):
@@ -9,10 +10,16 @@ class UserModel(db.Model):
     password = db.Column(db.String(80))
     email = db.Column(db.String(80))
 
-    def __init__(self, username, password, email):
+    def __init__(self, username, password, email, id):
         self.username = username
         self.password = password
         self.email = email
+
+    def __str__(self) -> str:
+        return f"ID: {self.id} Username: {self.username}, Email: {self.email}"
+
+    def __str__(self) -> str:
+        return f"<User({self.id}, {self.username}, {self.email})>"
 
     def json(self):  ## Be sure to erase the 'password' field on line 21 before use, I just left this in here for testing!
         return {
