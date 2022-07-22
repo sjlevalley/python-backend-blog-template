@@ -16,7 +16,6 @@ class VoteModel(db.Model):
     # votes = db.relationship('VoteModel', lazy='dynamic')
 
     def __init__(self, date, user_id, type, article_id):
-        self.id = uuid.uuid4
         self.date = date
         self.user_id = user_id
         self.type = type

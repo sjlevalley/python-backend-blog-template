@@ -18,7 +18,6 @@ class ArticleModel(db.Model):
     votes = db.relationship(VoteModel, lazy='dynamic', overlaps="article")
 
     def __init__(self, title, subtitle, date, author, text):
-        self.id = uuid.uuid4
         self.title = title
         self.subtitle = subtitle
         self.date = date

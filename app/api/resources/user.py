@@ -19,7 +19,6 @@ salt = bcrypt.gensalt(rounds=12) # This is outside of all classes so that the sa
 class UserRegister(Resource):
     def post(self):
         data = _user_parser.parse_args()
-
         try: 
             if UserModel.find_by_username(data['username']):
                 return {"message": "A user with that username already exists"}, 400
@@ -28,16 +27,19 @@ class UserRegister(Resource):
                 return {"message": "A user with that email already exists"}, 400
 
             entered_password = data['password'].encode('utf-8')
+
+
             
             hashed = bcrypt.hashpw(entered_password, salt)
             decoded_hashed_password = hashed.decode('utf-8')
             
-            user = UserModel(data['username'], decoded_hashed_password, data['email']) # Saves Hashed Password 
+            user = UserModel(data['username'], decoded_hashed_password, data['email']) # Saves Hashed Password
             # user = UserModel(data['username'], data['password'], data['email']) # Saves unhashed password for testing only
             user.save_to_db()
             return user.json() , 201
         
-        except:
+        except Exception as e:
+            print(e)
             return {"message": "An error occurred while creating this user."}, 500
 
 

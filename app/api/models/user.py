@@ -1,7 +1,6 @@
 from db import db
 import uuid
 
-
 class UserModel(db.Model):
     __tablename__ = 'users'
 
@@ -10,7 +9,7 @@ class UserModel(db.Model):
     password = db.Column(db.String(80))
     email = db.Column(db.String(80))
 
-    def __init__(self, username, password, email, id):
+    def __init__(self, username, password, email):
         self.username = username
         self.password = password
         self.email = email
@@ -28,7 +27,7 @@ class UserModel(db.Model):
             'password': self.password, # Generally don't want to have this visible
             'email': self.email            
             }
-
+  
     def save_to_db(self):
         db.session.add(self)
         db.session.commit()

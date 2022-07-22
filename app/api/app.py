@@ -1,8 +1,3 @@
-# Add Try/Catches
-# Add uuid's after switch to PostgreSQL
-# Add TypeHints
-# Add Raise Errors
-
 from flask import Flask, jsonify
 from flask_restful import Api
 from flask_jwt_extended import JWTManager

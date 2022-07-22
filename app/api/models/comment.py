@@ -16,7 +16,6 @@ class CommentModel(db.Model):
     # votes = db.relationship('VoteModel', lazy='dynamic')
 
     def __init__(self, date, author, text, article_id):
-        self.id = uuid.uuid4
         self.date = date
         self.author = author
         self.text = text
